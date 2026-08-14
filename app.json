@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Dishari Mess",
+    "slug": "dishari-mess-aouoscwyht-i1jzhksumi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "dishari",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.dishari.messv2",
+      "versionCode": 1,
+      "permissions": [
+        "POST_NOTIFICATIONS"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#FFF8F3"
+      }
+    },
+
+    "notification": {
+      "icon": "./assets/images/icon.png"
+    },
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser",
+      "expo-notifications",
+      "./plugins/withUpiQueries"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "90c6b041-d355-4c73-bc71-93aab3e9774b"
+      }
+    },
+    "owner": "parimal89000"
+  }
+}
