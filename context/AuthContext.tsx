@@ -193,26 +193,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 );
 if (result?.role === "member") {
   try {
-    const pushToken =
-      await registerForPushNotifications();
+    if (!result.memberId) {
+      console.error(
+        "[Auth] Cannot save push token: resolved memberId is missing",
+        result,
+      );
+    } else {
+      console.log("[Auth] Registering push notifications for member", {
+        memberId: result.memberId,
+        authUserId: result.id,
+      });
 
-    console.log("Push Token:", pushToken);
+      const pushToken = await registerForPushNotifications(result.memberId);
 
-    if (pushToken) {
-      const { getSupabase } =
-        await import("@/lib/supabase");
-
-      const sb = getSupabase();
-
-      await sb
-        .from("members")
-        .update({
-          push_token: pushToken,
-        })
-        .eq("id", result.memberId);
+      console.log("[Auth] Push registration result", {
+        memberId: result.memberId,
+        tokenGenerated: Boolean(pushToken),
+        tokenPrefix: pushToken?.slice(0, 24) ?? null,
+      });
     }
   } catch (error) {
-    console.error(error);
+    console.error("[Auth] Push registration failed", {
+      memberId: result.memberId,
+      error,
+    });
   }
 }
 
