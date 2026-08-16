@@ -25,6 +25,7 @@ import { useToast } from "@/context/ToastContext";
 import { useColors } from "@/hooks/useColors";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { GradientBackground } from "@/components/GradientBackground";
+import { PremiumCard } from "@/components/PremiumCard";
 import { useRefresh } from "@/hooks/useRefresh";
 import { PRIMARY, EMERALD, RED, CYAN, ORANGE, YELLOW } from "@/constants/colors";
 
@@ -286,7 +287,7 @@ export default function MemberPayments() {
 
         {/* ── Full Bill Breakdown ────────────────────────────────────────── */}
         <View style={styles.section}>
-          <View style={[styles.card, { backgroundColor: card }]}>
+          <PremiumCard tone="creamButter" style={styles.card}>
             <View style={styles.cardHeader}>
               <View style={[styles.cardIcon, { backgroundColor: `${PRIMARY}15` }]}>
                 <Feather name="file-text" size={18} color={PRIMARY} />
@@ -377,12 +378,12 @@ export default function MemberPayments() {
                 </View>
               </>
             )}
-          </View>
+          </PremiumCard>
         </View>
 
         {/* ── UPI Payment Section ────────────────────────────────────────── */}
         <View style={styles.section}>
-          <View style={[styles.card, { backgroundColor: card }]}>
+          <PremiumCard tone="lavenderCream" style={styles.card}>
             <View style={styles.cardHeader}>
               <View style={[styles.cardIcon, { backgroundColor: "#7C3AED15" }]}>
                 <Feather name="send" size={18} color="#7C3AED" />
@@ -564,7 +565,7 @@ export default function MemberPayments() {
                 ))}
               </>
             )}
-          </View>
+          </PremiumCard>
         </View>
       </ScrollView>
 

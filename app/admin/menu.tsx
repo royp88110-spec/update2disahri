@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScreenHeader } from "@/components/ScreenHeader";
+import { PremiumCard } from "@/components/PremiumCard";
 import { useData } from "@/context/DataContext";
 import type { RoutineEntry, MenuItem } from "@/context/DataContext";
 import { useRefresh } from "@/hooks/useRefresh";
@@ -128,7 +129,10 @@ function MealCard({
   const hasItems = (entry?.items?.length ?? 0) > 0;
 
   return (
-    <View style={[mcStyles.card, GLASS_CARD, CARD_SHADOW]}>
+    <PremiumCard
+      tone={mealType === "lunch" ? "butterCream" : mealType === "dinner" ? "lavenderRose" : "skyMint"}
+      style={[mcStyles.card, GLASS_CARD, CARD_SHADOW]}
+    >
       {/* Colored accent strip */}
       <View style={[mcStyles.strip, { backgroundColor: meta.color }]} />
 
@@ -201,7 +205,7 @@ function MealCard({
           </Text>
         )}
       </View>
-    </View>
+    </PremiumCard>
   );
 }
 
@@ -458,7 +462,7 @@ export default function AdminMenuScreen() {
           />
 
           {/* Routine overview mini-grid */}
-          <View style={styles.overviewCard}>
+          <PremiumCard tone="lavenderCream" style={styles.overviewCard}>
             <Text style={styles.overviewTitle}>Routine Overview</Text>
             <View style={styles.overviewGrid}>
               {DAY_SHORT.map((day, dow) => {
@@ -491,7 +495,7 @@ export default function AdminMenuScreen() {
                 </View>
               ))}
             </View>
-          </View>
+          </PremiumCard>
         </ScrollView>
       </LinearGradient>
 

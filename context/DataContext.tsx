@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { isSupabaseConfigured } from "@/lib/supabase";
+import { sendExpoPushNotifications } from "@/lib/notification";
 
 export interface Announcement {
   id: string;
@@ -21,6 +22,7 @@ export interface Member {
   roomNumber?: string;
   status: "active" | "inactive";
   password: string;
+  pushToken?: string | null;
 }
 
 export interface Meal {
@@ -277,6 +279,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           roomNumber: (m.room_number as string | undefined) ?? undefined,
           status: m.status as "active" | "inactive",
           password: "",
+          pushToken: (m.push_token as string | null | undefined) ?? null,
         }))
       );
     }
@@ -1120,6 +1123,32 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       targetMemberId: (row.target_member_id as string | null) ?? null,
       targetMonth: (row.target_month as string | null) ?? null,
     }, ...prev]);
+
+    const recipients = members.filter(
+      (member) =>
+        member.status === "active" &&
+        (!targetMemberId || member.id === targetMemberId) &&
+        member.pushToken,
+    );
+    if (recipients.length > 0) {
+      try {
+        await sendExpoPushNotifications(
+          recipients.map((member) => ({
+            to: member.pushToken!,
+            title,
+            body,
+            sound: "default",
+            data: {
+              type,
+              announcementId: row.id,
+              route: type === "payment_reminder" ? "/member/payments" : "/member/notices",
+            },
+          })),
+        );
+      } catch (error) {
+        console.error("[PushNotifications] Announcement saved but push send failed", error);
+      }
+    }
   };
 
   const deleteAnnouncement = async (id: string) => {
@@ -1442,21 +1471,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const debtors = bills.filter((b) => b.dueAmount > 0);
     if (debtors.length === 0) return 0;
 
-    // Route through the API server so the service-role key is used and the
-    // schema migration can be applied automatically if the columns are missing.
-    const result = await apiCall("POST", "/admin/announcements/reminders", {
-      month,
-      debtors: debtors.map((b) => ({
-        memberId:   b.memberId,
-        memberName: b.memberName,
-        dueAmount:  b.dueAmount,
-      })),
-    }) as { sent: number; needsMigration?: boolean; migrationSql?: string };
-
-    if ((result as { needsMigration?: boolean }).needsMigration) {
-      throw new Error(
-        (result as { migrationSql?: string }).migrationSql ??
-        "Database migration required — run the SQL in your Supabase SQL Editor.",
+    for (const debtor of debtors) {
+      await addAnnouncement(
+        "Payment Reminder",
+        `Hello ${debtor.memberName}, your payment for ${month} is still pending. Outstanding amount: ₹${debtor.dueAmount.toFixed(0)}.`,
+        "payment_reminder",
+        debtor.memberId,
+        month,
       );
     }
 

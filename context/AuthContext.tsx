@@ -51,6 +51,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // when login() is already doing it explicitly.
   const loggingIn = useRef(false);
 
+  const registerPushForUser = useCallback(async (resolvedUser: AuthUser | null) => {
+    if (!resolvedUser || resolvedUser.role !== "member" || !resolvedUser.memberId) {
+      return;
+    }
+
+    try {
+      const pushToken = await registerForPushNotifications(resolvedUser.memberId);
+      console.log("[Auth] Push registration result", {
+        memberId: resolvedUser.memberId,
+        tokenGenerated: Boolean(pushToken),
+        tokenPrefix: pushToken?.slice(0, 24) ?? null,
+      });
+    } catch (error) {
+      console.error("[Auth] Push registration failed", {
+        memberId: resolvedUser.memberId,
+        error,
+      });
+    }
+  }, []);
+
   const refreshSetupStatus = useCallback(async () => {
     if (!supabaseReady) return;
     const controller = new AbortController();
@@ -129,10 +149,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { session } } = await sb.auth.getSession();
 
     if (mounted) {
-      await loadMemberForSession(
+      const resolvedUser = await loadMemberForSession(
         session?.user.id,
         session?.user.user_metadata
       );
+      if (mounted) {
+        void registerPushForUser(resolvedUser);
+      }
     }
 
     // Setup status background-এ check হবে,
@@ -169,7 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       mounted = false;
       unsubscribe?.();
     };
-  }, [loadMemberForSession, refreshSetupStatus, supabaseReady]);
+  }, [loadMemberForSession, refreshSetupStatus, registerPushForUser, supabaseReady]);
 
   /**
    * Signs in with Supabase, loads the member profile, and returns the resolved
@@ -191,34 +214,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   data.session.user.id,
   data.session.user.user_metadata
 );
-if (result?.role === "member") {
-  try {
-    if (!result.memberId) {
-      console.error(
-        "[Auth] Cannot save push token: resolved memberId is missing",
-        result,
-      );
-    } else {
-      console.log("[Auth] Registering push notifications for member", {
-        memberId: result.memberId,
-        authUserId: result.id,
-      });
-
-      const pushToken = await registerForPushNotifications(result.memberId);
-
-      console.log("[Auth] Push registration result", {
-        memberId: result.memberId,
-        tokenGenerated: Boolean(pushToken),
-        tokenPrefix: pushToken?.slice(0, 24) ?? null,
-      });
-    }
-  } catch (error) {
-    console.error("[Auth] Push registration failed", {
-      memberId: result.memberId,
-      error,
-    });
-  }
-}
+    await registerPushForUser(result);
 
 loggingIn.current = false;
 

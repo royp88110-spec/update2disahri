@@ -3,6 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useRef, useState } from "react";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { MemberAvatar } from "@/components/MemberAvatar";
+import { PremiumCard } from "@/components/PremiumCard";
 import {
   Alert,
   FlatList,
@@ -48,7 +49,7 @@ const MemberCard = React.memo(function MemberCard({
       <Pressable
         onLongPress={() => onEdit(member)}
       >
-        <View style={[styles.memberCard, { backgroundColor: colors.card }]}>
+        <PremiumCard tone="lavenderCream" style={styles.memberCard}>
           <MemberAvatar
             name={member.name}
             size={44}
@@ -94,7 +95,7 @@ const MemberCard = React.memo(function MemberCard({
               <Feather name="trash-2" size={18} color={colors.destructive} />
             </Pressable>
           </View>
-        </View>
+        </PremiumCard>
       </Pressable>
     </View>
   );

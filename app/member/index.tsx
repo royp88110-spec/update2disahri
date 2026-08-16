@@ -20,6 +20,7 @@ import { useToast } from "@/context/ToastContext";
 import { useColors } from "@/hooks/useColors";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { GradientBackground } from "@/components/GradientBackground";
+import { PremiumCard } from "@/components/PremiumCard";
 import { useRefresh } from "@/hooks/useRefresh";
 import { PRIMARY, EMERALD, RED, CYAN, ORANGE, YELLOW } from "@/constants/colors";
 
@@ -330,17 +331,18 @@ export default function MemberHome() {
         {/* ── Go to Payments Card ───────────────────────────────────────── */}
         <View style={styles.section}>
           <Pressable
-            style={({ pressed }) => [styles.sectionCard, { backgroundColor: card, opacity: pressed ? 0.92 : 1 }]}
+            style={({ pressed }) => [{ opacity: pressed ? 0.92 : 1 }]}
             onPress={() => router.navigate("/member/payments")}
           >
-            <View style={styles.sectionCardHeader}>
+            <PremiumCard tone="lavenderCream" style={styles.sectionCard}>
+              <View style={styles.sectionCardHeader}>
               <View style={[styles.sectionCardIcon, { backgroundColor: "#7C3AED15" }]}>
                 <Feather name="credit-card" size={18} color="#7C3AED" />
               </View>
               <Text style={[styles.sectionCardTitle, { color: cardText }]}>View Full Bill & Pay</Text>
               <Feather name="chevron-right" size={18} color={muted} style={{ marginLeft: "auto" }} />
-            </View>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 12 }}>
+              </View>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 12 }}>
               <View>
                 <Text style={{ fontSize: 12, color: muted }}>Remaining Due</Text>
                 <Text style={{ fontSize: 20, fontWeight: "800", color: remainingDue > 0 ? RED : EMERALD }}>
@@ -353,19 +355,20 @@ export default function MemberHome() {
                   ₹{safeFix(bill.dueAmount, 2)}
                 </Text>
               </View>
-            </View>
-            <View style={{ marginTop: 14, padding: 12, borderRadius: 12, backgroundColor: "#7C3AED10", flexDirection: "row", alignItems: "center", gap: 8 }}>
+              </View>
+              <View style={{ marginTop: 14, padding: 12, borderRadius: 12, backgroundColor: "#7C3AED10", flexDirection: "row", alignItems: "center", gap: 8 }}>
               <Feather name="send" size={14} color="#7C3AED" />
               <Text style={{ fontSize: 13, color: "#7C3AED", fontWeight: "600" }}>
                 Tap to view bill details and submit UPI payment
               </Text>
-            </View>
+              </View>
+            </PremiumCard>
           </Pressable>
         </View>
 
         {/* ── Egg Bill Card ─────────────────────────────────────────────── */}
         <View style={styles.section}>
-          <View style={[styles.sectionCard, { backgroundColor: card }]}>
+          <PremiumCard tone="butterCream" style={styles.sectionCard}>
             <View style={styles.sectionCardHeader}>
               <View style={[styles.sectionCardIcon, { backgroundColor: `${YELLOW}20` }]}>
                 <Feather name="sun" size={18} color={YELLOW} />
@@ -388,7 +391,7 @@ export default function MemberHome() {
                 Egg cost is included in your monthly gross bill.
               </Text>
             </View>
-          </View>
+          </PremiumCard>
         </View>
 
         {/* ── Announcements ─────────────────────────────────────────────── */}
@@ -396,12 +399,10 @@ export default function MemberHome() {
           <View style={[styles.section, { marginBottom: 8 }]}>
             <Text style={[styles.sectionTitle, { color: cardText }]}>📣 Announcements</Text>
             {recentAnnouncements.map((a, i) => (
-              <View
+              <PremiumCard
                 key={a.id}
-                style={[
-                  styles.announcementCard,
-                  { marginTop: i === 0 ? 12 : 10, backgroundColor: card, borderColor: `${PRIMARY}18` },
-                ]}
+                tone="skyMint"
+                style={[styles.announcementCard, { marginTop: i === 0 ? 12 : 10, borderColor: `${PRIMARY}18` }]}
               >
                 <View style={[styles.announcementDot, { backgroundColor: PRIMARY }]} />
                 <View style={{ flex: 1 }}>
@@ -413,7 +414,7 @@ export default function MemberHome() {
                     {a.createdAt?.slice(0, 10) ?? ""}
                   </Text>
                 </View>
-              </View>
+              </PremiumCard>
             ))}
           </View>
         )}

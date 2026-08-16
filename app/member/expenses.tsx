@@ -3,6 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { GradientBackground } from "@/components/GradientBackground";
+import { PremiumCard } from "@/components/PremiumCard";
 import {
   FlatList,
   Pressable,
@@ -93,7 +94,7 @@ export default function MemberExpenses() {
 
       {/* Summary */}
       <View>
-        <View style={styles.summaryCard}>
+        <PremiumCard tone="rosePeach" style={styles.summaryCard}>
           {[
             { label: "Market Exp.", val: `₹${total.toFixed(0)}`, color: colors.foreground },
             { label: "Cook Salary", val: `₹${cookTotal.toFixed(0)}`, color: colors.foreground },
@@ -105,7 +106,7 @@ export default function MemberExpenses() {
               {i < arr.length - 1 && <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />}
             </View>
           ))}
-        </View>
+        </PremiumCard>
       </View>
 
       {/* Category chips */}
@@ -146,7 +147,10 @@ export default function MemberExpenses() {
           const cat = getCat(e.type);
           return (
             <View style={{ marginBottom: 10 }}>
-              <View style={styles.expenseRow}>
+              <PremiumCard
+                tone={index % 4 === 0 ? "peachCream" : index % 4 === 1 ? "lavenderCream" : index % 4 === 2 ? "mintCream" : "creamButter"}
+                style={styles.expenseRow}
+              >
                 <View style={[styles.expIcon, { backgroundColor: cat.color + "20" }]}>
                   <Feather name={cat.icon as "list"} size={20} color={cat.color} />
                 </View>
@@ -156,7 +160,7 @@ export default function MemberExpenses() {
                   <Text style={[styles.expDate, { color: colors.mutedForeground }]}>{e.date}</Text>
                 </View>
                 <Text style={[styles.expAmount, { color: colors.foreground }]}>₹{e.amount}</Text>
-              </View>
+              </PremiumCard>
             </View>
           );
         }}

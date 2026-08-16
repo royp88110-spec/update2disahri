@@ -25,6 +25,7 @@ import { useToast } from "@/context/ToastContext";
 import { useColors } from "@/hooks/useColors";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { MemberAvatar } from "@/components/MemberAvatar";
+import { PremiumCard } from "@/components/PremiumCard";
 import { useRefresh } from "@/hooks/useRefresh";
 import { BG_GRADIENT, PRIMARY, EMERALD, RED, ORANGE } from "@/constants/colors";
 
@@ -60,7 +61,7 @@ function safeFix(n: number, digits = 0) {
 function StatCard({ label, value, icon, color }: { label: string; value: string; icon: string; color: string }) {
   const colors = useColors();
   return (
-    <View style={[styles.statCard, { backgroundColor: colors.card }]}>
+    <PremiumCard tone="lavenderSky" style={styles.statCard}>
       <View style={styles.statCardInner}>
         <View style={[styles.statIcon, { backgroundColor: color + "18", alignSelf: "flex-start" }]}>
           <Feather name={icon as "home"} size={22} color={color} />
@@ -68,7 +69,7 @@ function StatCard({ label, value, icon, color }: { label: string; value: string;
         <Text style={[styles.statValue, { color: colors.cardForeground }]}>{value}</Text>
         <Text style={[styles.statLabel, { color: colors.mutedForeground }]}>{label}</Text>
       </View>
-    </View>
+    </PremiumCard>
   );
 }
 
@@ -390,7 +391,7 @@ export default function AdminDashboard() {
         }
       >
         {/* Month navigator */}
-        <View style={[styles.monthNav, { backgroundColor: colors.card }]}>
+        <PremiumCard tone="lavenderCream" style={styles.monthNav}>
           <Pressable onPress={() => setMonth(prevMonth(month))} style={styles.navArrow}>
             <Feather name="chevron-left" size={22} color={PRIMARY} />
           </Pressable>
@@ -398,7 +399,7 @@ export default function AdminDashboard() {
           <Pressable onPress={() => setMonth(nextMonth(month))} style={styles.navArrow}>
             <Feather name="chevron-right" size={22} color={PRIMARY} />
           </Pressable>
-        </View>
+        </PremiumCard>
 
         {/* Stat cards */}
         <View style={styles.statsGrid}>
@@ -435,7 +436,7 @@ export default function AdminDashboard() {
 
         {/* Payment status banner */}
         {bills.length > 0 && (
-          <View style={[styles.paymentBanner, { backgroundColor: colors.card }]}>
+          <PremiumCard tone="mintCream" style={styles.paymentBanner}>
             <View style={styles.paymentBannerLeft}>
               <Feather
                 name="check-circle"
@@ -457,11 +458,11 @@ export default function AdminDashboard() {
                 {paidCount === bills.length ? "All Settled" : "Pending"}
               </Text>
             </View>
-          </View>
+          </PremiumCard>
         )}
 
         {/* Monthly summary */}
-        <View style={[styles.section, { backgroundColor: colors.card }]}>
+        <PremiumCard tone="creamButter" style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Monthly Summary</Text>
           {[
             ["Total Monthly Expense",   `₹${totalExpense.toFixed(0)}`,  colors.foreground],
@@ -477,7 +478,7 @@ export default function AdminDashboard() {
               </View>
             </View>
           ))}
-        </View>
+        </PremiumCard>
 
         {/* Payment Summary */}
         {(() => {
@@ -500,7 +501,7 @@ export default function AdminDashboard() {
           }).length;
           const pendingSubs = paymentSubmissions.filter((s) => s.status === "pending").length;
           return (
-            <View style={[styles.section, { backgroundColor: colors.card }]}>
+            <PremiumCard tone="mintCream" style={styles.section}>
               <View style={styles.sectionTitleRow}>
                 <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Payment Summary</Text>
                 <Pressable
@@ -553,12 +554,12 @@ export default function AdminDashboard() {
                 <Text style={[styles.summaryKey, { color: colors.mutedForeground }]}>Still Outstanding</Text>
                 <Text style={[styles.summaryVal, { color: ORANGE }]}>₹{safeFix(Math.max(0, totalDue - totalPaid))}</Text>
               </View>
-            </View>
+            </PremiumCard>
           );
         })()}
 
         {/* Recent expenses */}
-        <View style={[styles.section, { backgroundColor: colors.card }]}>
+        <PremiumCard tone="rosePeach" style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Recent Expenses</Text>
           {monthExpenses.length === 0 ? (
             <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>No expenses this month</Text>
@@ -579,7 +580,7 @@ export default function AdminDashboard() {
               <View style={[styles.divider, { backgroundColor: colors.border }]} />
             </View>
           ))}
-        </View>
+        </PremiumCard>
       </ScrollView>
 
       {/* ── Announcement Sidebar ── */}

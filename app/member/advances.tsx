@@ -3,6 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useState } from "react";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { GradientBackground } from "@/components/GradientBackground";
+import { PremiumCard } from "@/components/PremiumCard";
 import {
   FlatList,
   Pressable,
@@ -130,7 +131,7 @@ export default function MemberAdvances() {
         }
         renderItem={({ item: a, index }) => (
           <View style={{ marginBottom: 12 }}>
-            <View style={styles.advCard}>
+            <PremiumCard tone="mintCream" style={styles.advCard}>
               <View style={styles.advIconWrap}>
                 <LinearGradient colors={[EMERALD, "#10B981"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.advIconGradient}>
                   <Feather name="arrow-up-right" size={20} color="#fff" />
@@ -144,7 +145,7 @@ export default function MemberAdvances() {
               <View style={styles.paidBadge}>
                 <Text style={styles.paidText}>Paid</Text>
               </View>
-            </View>
+            </PremiumCard>
           </View>
         )}
       />

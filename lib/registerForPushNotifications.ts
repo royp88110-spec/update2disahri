@@ -137,36 +137,47 @@ async function savePushToken(
     const { getSupabase } = await import("@/lib/supabase");
     const supabase = getSupabase();
 
-    let update = supabase
-      .from("members")
-      .update({ push_token: token });
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-    if (memberId) {
-      update = update.eq("id", memberId);
-    } else {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError || !user) {
-        console.error(
-          "[PushNotifications] Could not identify the member for token save",
-          userError,
-        );
-        return false;
-      }
-
-      update = update.eq("user_id", user.id);
+    if (userError || !user) {
+      console.error(
+        "[PushNotifications] Could not identify the member for token save",
+        userError,
+      );
+      return false;
     }
 
-    const { error } = await update;
+    // Prefer the authenticated user's relation. The member id fallback keeps
+    // this helper usable for legacy rows without user_id.
+    let update = supabase
+      .from("members")
+      .update({ push_token: token })
+      .select("id");
+    update = update.eq("user_id", user.id);
 
-    if (error) {
-      console.error(
-        "[PushNotifications] Push token could not be saved in Supabase",
-        error,
-      );
+    let result = await update.maybeSingle();
+    if (!result.data && !result.error && memberId) {
+      result = await supabase
+        .from("members")
+        .update({ push_token: token })
+        .eq("id", memberId)
+        .select("id")
+        .maybeSingle();
+    }
+
+    if (result.error) {
+      console.error("[PushNotifications] Push token could not be saved in Supabase", result.error);
+      return false;
+    }
+
+    if (!result.data) {
+      console.error("[PushNotifications] Push token update matched no member row", {
+        memberId,
+        authUserId: user.id,
+      });
       return false;
     }
 
@@ -252,7 +263,10 @@ export async function registerForPushNotifications(memberId?: string) {
       token.data,
     );
 
-    await savePushToken(token.data, memberId);
+    const saved = await savePushToken(token.data, memberId);
+    if (!saved) {
+      return null;
+    }
 
     return token.data;
   } catch (error) {

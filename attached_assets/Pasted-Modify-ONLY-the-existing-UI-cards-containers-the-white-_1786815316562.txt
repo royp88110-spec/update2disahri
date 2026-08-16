@@ -1,0 +1,87 @@
+Modify ONLY the existing UI cards/containers (the white boxes) across these screens: Dashboard, Members, Payments, Meals, Menu, Expenses, Eggs, Advances, Bills, and More.
+
+STRICT RULES:
+- Do NOT change any layout.
+- Do NOT change spacing, padding, margins, fonts, icons, navigation, data, functionality, component size, or screen structure.
+- Keep all existing features exactly the same.
+- Keep the current purple header and bottom navigation unchanged.
+- ONLY redesign the white cards/boxes by adding soft, premium colors.
+
+Design style:
+Create a modern, premium, glass-like UI inspired by high-end finance and productivity apps.
+
+Use these colors:
+- Butter: #F8E16C
+- Bistre: #3D2B1F
+- Aureolin: #FDEE00
+- Violet: #7F5AF0
+- Imperial Red: #ED2939
+
+You may also use these supporting colors:
+- Cream: #FFF8E7
+- Lavender: #EDE4FF
+- Mint: #DDF8E8
+- Peach: #FFE5D4
+- Sky: #E3F4FF
+- Rose: #FFE1E8
+- Soft Gold: #F7D774
+
+Card redesign rules:
+- Remove the plain white appearance.
+- Every card should have a different but consistent color palette.
+- Use very light gradients instead of solid white.
+- Keep text readability very high.
+- Add subtle shadows.
+- Add a soft glassmorphism effect.
+- Use 18-22px border radius.
+- Add a very thin colored border.
+- Keep the UI clean, minimal, and premium.
+
+Suggested color mapping:
+
+Dashboard:
+- Statistics cards → Lavender + Sky gradient
+- Monthly Summary → Cream + Butter gradient
+- Payment Summary → Mint + Cream gradient
+- Recent Expenses → Rose + Peach gradient
+
+Members:
+- Member cards → Lavender + Cream gradient
+- Active badge → Mint
+- Inactive badge → Imperial Red with low opacity
+
+Payments:
+- Summary cards → Butter + Cream gradient
+- Payment cards → Mint + Sky gradient
+- UPI Settings → Lavender + Cream gradient
+
+Menu:
+- Lunch → Butter + Cream gradient
+- Dinner → Lavender + Rose gradient
+- Tiffin → Sky + Mint gradient
+- Routine Overview → Cream + Lavender gradient
+
+Expenses:
+- Expense cards → Alternate between Peach, Lavender, Mint, and Cream backgrounds.
+
+Eggs:
+- Egg entry cards → Butter + Cream gradient.
+
+Advances:
+- Advance cards → Mint + Cream gradient.
+
+Bills:
+- Bill cards → Alternate between Lavender + Cream and Peach + Cream gradients.
+- Due amounts should remain red.
+- Paid amounts should remain green.
+
+More/Setup:
+- Cook Salary → Butter + Cream gradient.
+- Egg Price → Lavender + Cream gradient.
+
+Animations:
+- Add a very subtle hover/press effect.
+- Add a smooth 200ms transition.
+- No flashy animations.
+
+The result should feel colorful, elegant, modern, and premium without changing any existing functionality.

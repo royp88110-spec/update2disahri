@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useState } from "react";
 import { ScreenHeader } from "@/components/ScreenHeader";
+import { PremiumCard } from "@/components/PremiumCard";
 import {
   Alert,
   FlatList,
@@ -225,7 +226,10 @@ export default function ExpensesScreen() {
             <View
               style={{ marginBottom: 10 }}
             >
-              <View style={[styles.expenseCard, { backgroundColor: colors.card }]}>
+              <PremiumCard
+                tone={index % 4 === 0 ? "peachCream" : index % 4 === 1 ? "lavenderCream" : index % 4 === 2 ? "mintCream" : "creamButter"}
+                style={styles.expenseCard}
+              >
                 <View style={[styles.expenseIcon, { backgroundColor: cat.color + "18" }]}>
                   <Feather name={cat.icon as "list"} size={20} color={cat.color} />
                 </View>
@@ -253,7 +257,7 @@ export default function ExpensesScreen() {
                     <Feather name="trash-2" size={16} color={colors.destructive} />
                   </Pressable>
                 </View>
-              </View>
+              </PremiumCard>
             </View>
           );
         }}

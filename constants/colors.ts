@@ -7,8 +7,8 @@ const colors = {
     /** Fallback only — screens use a LinearGradient background */
     background: "#DDF5FF",
     foreground: "#1E1B4B",
-    /** Glass-white card surface */
-    card: "rgba(255,255,255,0.92)",
+    /** Premium card fallback; screen cards use pastel gradients */
+    card: "#FFF8E7",
     cardForeground: "#1E1B4B",
     primary: "#4F46E5",
     primaryForeground: "#FFFFFF",
@@ -78,9 +78,9 @@ export const RED    = "#F43F5E";
 
 // Card glass style (spread into StyleSheet objects)
 export const GLASS_CARD = {
-  backgroundColor: "rgba(255,255,255,0.92)" as const,
+  backgroundColor: "#FFF8E7" as const,
   borderWidth: 1,
-  borderColor: "rgba(255,255,255,0.6)" as const,
+  borderColor: "#E9D58A" as const,
 } as const;
 
 export const CARD_SHADOW = {

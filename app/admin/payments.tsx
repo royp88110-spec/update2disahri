@@ -4,6 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { MemberAvatar } from "@/components/MemberAvatar";
+import { PremiumCard } from "@/components/PremiumCard";
 import {
   ActivityIndicator,
   Alert,
@@ -253,7 +254,7 @@ export default function AdminPaymentsScreen() {
         refreshControl={REFRESH}
       >
         {/* ── Month Summary ─────────────────────────────────────────────────── */}
-        <View style={[styles.summaryCard, { backgroundColor: colors.card }]}>
+        <PremiumCard tone="butterCream" style={styles.summaryCard}>
           <Text style={[styles.summaryTitle, { color: colors.foreground }]}>
             {monthLabel(month)} Summary
           </Text>
@@ -267,7 +268,7 @@ export default function AdminPaymentsScreen() {
               <Text style={[styles.summaryVal, { color }]}>{val}</Text>
             </View>
           ))}
-        </View>
+        </PremiumCard>
 
         {/* ── Pending alert ─────────────────────────────────────────────────── */}
         {pendingCount > 0 && (
@@ -322,7 +323,7 @@ export default function AdminPaymentsScreen() {
         ) : filteredSubmissions.map((sub) => {
           const sc = statusColor(sub.status);
           return (
-            <View key={sub.id} style={[styles.payCard, { backgroundColor: colors.card }]}>
+            <PremiumCard key={sub.id} tone="mintCream" style={styles.payCard}>
               <View style={styles.payCardHeader}>
                 <MemberAvatar name={getMemberName(sub.memberId)} size={44} bgColor={`${sc}18`} textColor={sc} />
                 <View style={styles.payCardInfo}>
@@ -403,7 +404,7 @@ export default function AdminPaymentsScreen() {
                   </Pressable>
                 </View>
               )}
-            </View>
+            </PremiumCard>
           );
         })}
 
@@ -412,7 +413,7 @@ export default function AdminPaymentsScreen() {
           UPI Settings
         </Text>
 
-        <View style={[styles.upiCard, { backgroundColor: colors.card }]}>
+        <PremiumCard tone="lavenderCream" style={styles.upiCard}>
           <View style={styles.upiCardHeader}>
             <View style={[styles.upiCardIcon, { backgroundColor: "#7C3AED15" }]}>
               <Feather name="send" size={18} color="#7C3AED" />
@@ -471,7 +472,7 @@ export default function AdminPaymentsScreen() {
               <Text style={styles.saveBtnText}>{isSavingUpi ? "Saving…" : "Save UPI Settings"}</Text>
             </LinearGradient>
           </Pressable>
-        </View>
+        </PremiumCard>
       </ScrollView>
 
       {/* ── Cash Payment Modal ────────────────────────────────────────────────── */}
