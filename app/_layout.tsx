@@ -8,6 +8,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { DataProvider } from "@/context/DataContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { ToastProvider } from "@/context/ToastContext";
 
 const queryClient = new QueryClient();
@@ -49,22 +50,24 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <SafeAreaProvider style={{ backgroundColor: "#7DE7D8" }}>
-      <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <DataProvider>
-            <AuthProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <KeyboardProvider>
-                  <ToastProvider>
-                    <RootLayoutNav />
-                  </ToastProvider>
-                </KeyboardProvider>
-              </GestureHandlerRootView>
-            </AuthProvider>
-          </DataProvider>
-        </QueryClientProvider>
-      </ErrorBoundary>
-    </SafeAreaProvider>
+    <ThemeProvider>
+      <SafeAreaProvider style={{ backgroundColor: "#7DE7D8" }}>
+        <ErrorBoundary>
+          <QueryClientProvider client={queryClient}>
+            <DataProvider>
+              <AuthProvider>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <KeyboardProvider>
+                    <ToastProvider>
+                      <RootLayoutNav />
+                    </ToastProvider>
+                  </KeyboardProvider>
+                </GestureHandlerRootView>
+              </AuthProvider>
+            </DataProvider>
+          </QueryClientProvider>
+        </ErrorBoundary>
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 }

@@ -1,0 +1,106 @@
+IMPORTANT: Analyze ONLY the PDF Export and Dark Mode features.
+
+Do NOT modify:
+
+- Database structure
+- Existing calculations
+- Authentication
+- Navigation
+- UI layout
+- Existing screens
+- Business logic
+- APIs
+- Any unrelated files
+
+Check only the files directly related to PDF generation and theme management.
+
+--------------------------------------------------
+TASK 1: PREMIUM PDF EXPORT (ADMIN + MEMBER)
+--------------------------------------------------
+
+Implement a professional PDF export system.
+
+ADMIN REQUIREMENTS:
+
+- Admin can export any member's monthly bill as a PDF.
+- Add a "Download PDF" button in the bill/details screen.
+
+The Admin PDF must include:
+
+- App name and logo
+- Member name
+- Month and year
+- Total meals
+- Meal rate
+- Meal cost
+- Egg count
+- Egg cost
+- Advance payments
+- Cook salary
+- Total expenses
+- Final payable amount
+- Credit balance (if applicable)
+- Due amount
+- Payment status (Paid/Partial/Due)
+- PDF generation date
+
+MEMBER REQUIREMENTS:
+
+- Members can export only their own monthly bills.
+- Members must not be able to access another member's PDF.
+- Use a different PDF layout for members.
+
+PDF DESIGN REQUIREMENTS:
+
+Do NOT create a simple PDF.
+
+The PDF should look like a premium invoice.
+
+Include:
+
+- Branded header
+- Summary cards
+- Proper tables
+- Clean typography
+- Professional spacing
+- Rounded sections
+- Payment status badges
+- Footer section
+- Mobile-friendly design
+- Desktop-friendly design
+
+Use these colors:
+
+- Butter
+- Bistre
+- Aureolin
+- Violet
+- Imperial Red
+
+You may add complementary colors if necessary.
+
+--------------------------------------------------
+TASK 2: DARK MODE
+--------------------------------------------------
+
+Add a Dark Mode toggle for both Admin and Member.
+
+Requirements:
+
+- The app must always open in Light Mode.
+- Even if the device is using Dark Mode, the app must remain in Light Mode.
+- Force all screens to use the Light theme.
+- Add a Dark Mode toggle in Settings.
+- Save the user's theme preference.
+- Keep Light Mode as the default mode.
+
+--------------------------------------------------
+FINAL RULES
+--------------------------------------------------
+
+- Check all related files before making any changes.
+- Modify only the files required for PDF export and theme settings.
+- Do not touch any other feature.
+- Do not create unnecessary files.
+- Keep all existing functionality unchanged.
+- Show me exactly which files were modified before applying the changes.
