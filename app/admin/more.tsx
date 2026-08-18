@@ -14,6 +14,7 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   View,
@@ -22,8 +23,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useData } from "@/context/DataContext";
 import type { Fine } from "@/context/DataContext";
+import { useTheme } from "@/context/ThemeContext";
 import { useColors } from "@/hooks/useColors";
 import { useRefresh } from "@/hooks/useRefresh";
+import { exportMonthlyBillPdf } from "@/lib/pdfExport";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -111,16 +114,18 @@ export default function MoreScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const {
-    members, eggs, advances, fines, settings, announcements,
+    members, eggs, advances, fines, settings, announcements, payments,
     setEggEntry, addAdvance, deleteAdvance,
     addFine, updateFine, deleteFine,
-    updateSettings, calculateAllMonthlyBills,
+    updateSettings, calculateAllMonthlyBills, getMonthTotals,
     addAnnouncement, deleteAnnouncement, sendPaymentReminders,
   } = useData();
 
   const { refreshing, onRefresh } = useRefresh();
+  const { isDark, setTheme } = useTheme();
   const [activeSection, setActiveSection] = useState<Section>("eggs");
   const [month, setMonth] = useState(getCurrentMonth());
+  const [exportingMemberId, setExportingMemberId] = useState<string | null>(null);
 
   // Egg state
   const [eggModal, setEggModal]     = useState(false);
@@ -170,6 +175,25 @@ export default function MoreScreen() {
   const monthAdvances = advances.filter((a) => a.date.startsWith(month));
   const monthFines    = fines.filter((f) => f.date.startsWith(month));
   const bills         = calculateAllMonthlyBills(month);
+
+  const handleExportBill = async (bill: (typeof bills)[number]) => {
+    setExportingMemberId(bill.memberId);
+    try {
+      const payment = payments.find((p) => p.memberId === bill.memberId && p.month === month);
+      await exportMonthlyBillPdf({
+        audience: "admin",
+        bill,
+        month,
+        eggPrice: settings.eggPrice,
+        totalExpenses: getMonthTotals(month).totalExpense,
+        paymentAmount: payment?.amount ?? 0,
+      });
+    } catch (err) {
+      Alert.alert("PDF Export Failed", (err as Error).message || "Could not create this bill PDF.");
+    } finally {
+      setExportingMemberId(null);
+    }
+  };
 
   // ── Egg save ──
   const saveEgg = async () => {
@@ -516,10 +540,26 @@ export default function MoreScreen() {
               <View style={styles.reportHeader}>
                 <MemberAvatar name={b.memberName} size={44} bgColor="#4F46E518" textColor={PRIMARY} />
                 <Text style={[styles.reportName, { color: colors.foreground }]}>{b.memberName}</Text>
-                <View style={[styles.dueBadge, { backgroundColor: b.dueAmount > 0 ? "#DC262618" : "#16A34A18" }]}>
-                  <Text style={[styles.dueText, { color: b.dueAmount > 0 ? "#DC2626" : "#16A34A" }]}>
-                    {b.dueAmount > 0 ? `Due ₹${b.dueAmount.toFixed(0)}` : `Cr ₹${b.creditBalance.toFixed(0)}`}
-                  </Text>
+                <View style={styles.reportActions}>
+                  <Pressable
+                    onPress={() => void handleExportBill(b)}
+                    disabled={exportingMemberId === b.memberId}
+                    style={[styles.pdfButton, { backgroundColor: `${PRIMARY}12`, opacity: exportingMemberId === b.memberId ? 0.6 : 1 }]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Download ${b.memberName}'s bill as PDF`}
+                  >
+                    {exportingMemberId === b.memberId ? (
+                      <ActivityIndicator size="small" color={PRIMARY} />
+                    ) : (
+                      <Feather name="download" size={14} color={PRIMARY} />
+                    )}
+                    <Text style={[styles.pdfButtonText, { color: PRIMARY }]}>PDF</Text>
+                  </Pressable>
+                  <View style={[styles.dueBadge, { backgroundColor: b.dueAmount > 0 ? "#DC262618" : "#16A34A18" }]}>
+                    <Text style={[styles.dueText, { color: b.dueAmount > 0 ? "#DC2626" : "#16A34A" }]}>
+                      {b.dueAmount > 0 ? `Due ₹${b.dueAmount.toFixed(0)}` : `Cr ₹${b.creditBalance.toFixed(0)}`}
+                    </Text>
+                  </View>
                 </View>
               </View>
               <View style={[styles.divider, { backgroundColor: colors.border }]} />
@@ -548,6 +588,24 @@ export default function MoreScreen() {
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: insets.bottom + 100 }}
           refreshControl={REFRESH}
         >
+          <View style={[styles.settingCard, { backgroundColor: colors.card }]}>
+            <View style={styles.settingInputRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.settingTitle, { color: colors.foreground }]}>Dark Mode</Text>
+                <Text style={[styles.settingDesc, { color: colors.mutedForeground }]}>
+                  Choose the app theme. Light Mode is used by default and ignores device appearance.
+                </Text>
+              </View>
+              <Switch
+                value={isDark}
+                onValueChange={(enabled) => setTheme(enabled ? "dark" : "light")}
+                trackColor={{ false: "#CBD5E1", true: `${PRIMARY}80` }}
+                thumbColor={isDark ? PRIMARY : "#F8FAFC"}
+                accessibilityLabel="Toggle dark mode"
+              />
+            </View>
+          </View>
+
           <View style={[styles.settingCard, { backgroundColor: colors.card }]}>
             <Text style={[styles.settingTitle, { color: colors.foreground }]}>Cook Salary</Text>
             <Text style={[styles.settingDesc, { color: colors.mutedForeground }]}>Fixed amount charged per member per month</Text>
@@ -1183,6 +1241,9 @@ const styles = StyleSheet.create({
   },
   reportHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 14 },
   reportName: { flex: 1, fontSize: 16, fontWeight: "700" },
+  reportActions: { alignItems: "flex-end", gap: 7 },
+  pdfButton: { flexDirection: "row", alignItems: "center", gap: 5, borderRadius: 10, paddingHorizontal: 9, paddingVertical: 6 },
+  pdfButtonText: { fontSize: 11, fontWeight: "800" },
   dueBadge: { borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5 },
   dueText: { fontSize: 12, fontWeight: "700" },
   divider: { height: 1, marginBottom: 8 },

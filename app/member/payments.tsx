@@ -28,6 +28,7 @@ import { GradientBackground } from "@/components/GradientBackground";
 import { PremiumCard } from "@/components/PremiumCard";
 import { useRefresh } from "@/hooks/useRefresh";
 import { PRIMARY, EMERALD, RED, CYAN, ORANGE, YELLOW } from "@/constants/colors";
+import { exportMonthlyBillPdf } from "@/lib/pdfExport";
 
 // ── Month helpers ─────────────────────────────────────────────────────────────
 function getCurrentMonth() {
@@ -76,6 +77,7 @@ export default function MemberPayments() {
   const [screenshotBase64, setScreenshotBase64] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPayUpiPrompt, setShowPayUpiPrompt] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   // Screenshot viewer
   const [screenshotModalVisible, setScreenshotModalVisible] = useState(false);
@@ -131,6 +133,24 @@ export default function MemberPayments() {
   const handleCopyUpi = async () => {
     if (!upiSettings?.upiId) return;
     try { await Share.share({ message: upiSettings.upiId, title: "UPI ID" }); } catch {}
+  };
+
+  const handleExportPdf = async () => {
+    setIsExportingPdf(true);
+    try {
+      await exportMonthlyBillPdf({
+        audience: "member",
+        bill,
+        month,
+        eggPrice: settings.eggPrice,
+        totalExpenses: 0,
+        paymentAmount: paidAmount,
+      });
+    } catch (err) {
+      Alert.alert("PDF Export Failed", (err as Error).message || "Could not create your bill PDF.");
+    } finally {
+      setIsExportingPdf(false);
+    }
   };
 
   const handlePayViaUpi = async () => {
@@ -293,6 +313,20 @@ export default function MemberPayments() {
                 <Feather name="file-text" size={18} color={PRIMARY} />
               </View>
               <Text style={[styles.cardTitle, { color: cardText }]}>Bill Breakdown</Text>
+              <Pressable
+                onPress={() => void handleExportPdf()}
+                disabled={isExportingPdf}
+                style={[styles.pdfButton, { backgroundColor: `${PRIMARY}12`, opacity: isExportingPdf ? 0.6 : 1 }]}
+                accessibilityRole="button"
+                accessibilityLabel="Download my bill as PDF"
+              >
+                {isExportingPdf ? (
+                  <ActivityIndicator size="small" color={PRIMARY} />
+                ) : (
+                  <Feather name="download" size={14} color={PRIMARY} />
+                )}
+                <Text style={[styles.pdfButtonText, { color: PRIMARY }]}>PDF</Text>
+              </Pressable>
             </View>
 
             {[
@@ -677,6 +711,8 @@ const styles = StyleSheet.create({
   cardHeader: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 14 },
   cardIcon: { width: 38, height: 38, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   cardTitle: { fontSize: 16, fontWeight: "700", flex: 1 },
+  pdfButton: { flexDirection: "row", alignItems: "center", gap: 5, borderRadius: 10, paddingHorizontal: 9, paddingVertical: 6 },
+  pdfButtonText: { fontSize: 11, fontWeight: "800" },
 
   // Status card
   statusCard: {

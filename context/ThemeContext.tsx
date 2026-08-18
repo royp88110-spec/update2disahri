@@ -18,6 +18,9 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  // Start in light mode regardless of the device appearance. A saved value is
+  // restored only after the first render, so the system theme never controls
+  // the app and Light Mode remains the default for new users.
   const [theme, setThemeState] = useState<AppTheme>("light");
 
   useEffect(() => {

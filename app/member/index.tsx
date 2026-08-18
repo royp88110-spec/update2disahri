@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/context/DataContext";
+import { useTheme } from "@/context/ThemeContext";
 import { useToast } from "@/context/ToastContext";
 import { useColors } from "@/hooks/useColors";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -62,6 +63,7 @@ export default function MemberHome() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
+  const { isDark, setTheme } = useTheme();
   const {
     calculateMonthlyBill, announcements, payments, settings, isLoaded,
   } = useData();
@@ -205,9 +207,20 @@ export default function MemberHome() {
         avatarName={user?.name}
         avatarUrl={user?.photoUrl}
         rightElement={
-          <Pressable onPress={handleLogout} style={styles.logoutBtn} hitSlop={10}>
-            <Feather name="log-out" size={20} color="rgba(255,255,255,0.85)" />
-          </Pressable>
+          <View style={styles.headerActions}>
+            <Pressable
+              onPress={() => setTheme(isDark ? "light" : "dark")}
+              style={styles.themeBtn}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel={`Switch to ${isDark ? "light" : "dark"} mode`}
+            >
+              <Feather name={isDark ? "sun" : "moon"} size={18} color="rgba(255,255,255,0.9)" />
+            </Pressable>
+            <Pressable onPress={handleLogout} style={styles.logoutBtn} hitSlop={10}>
+              <Feather name="log-out" size={20} color="rgba(255,255,255,0.85)" />
+            </Pressable>
+          </View>
         }
         bottomElement={
           <View style={styles.headerMonthNav}>
@@ -427,6 +440,14 @@ export default function MemberHome() {
 // ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   // Header
+  headerActions: { flexDirection: "row", alignItems: "center", gap: 8 },
+  themeBtn: {
+    width: 38, height: 38,
+    borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    borderWidth: 1, borderColor: "rgba(255,255,255,0.25)",
+    alignItems: "center", justifyContent: "center",
+  },
   logoutBtn: {
     width: 38, height: 38,
     borderRadius: 12,
