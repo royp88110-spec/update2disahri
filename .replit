@@ -7,5 +7,9 @@ channel = "stable-25_05"
 expertMode = true
 
 [[ports]]
+localPort = 5000
+externalPort = 5000
+
+[[ports]]
 localPort = 18269
 externalPort = 80
