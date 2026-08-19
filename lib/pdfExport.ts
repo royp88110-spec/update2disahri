@@ -6,7 +6,7 @@ import type { MonthlyBill } from "@/context/DataContext";
 
 export type PdfAudience = "admin" | "member";
 
-interface PdfExportOptions {
+export interface PdfExportOptions {
   audience: PdfAudience;
   bill: MonthlyBill;
   month: string;
@@ -183,15 +183,34 @@ export async function exportMonthlyBillPdf(options: PdfExportOptions) {
   const html = buildHtml(options);
 
   if (Platform.OS === "web") {
-    const popup = window.open("", "_blank", "noopener,noreferrer");
-    if (popup) {
-      popup.document.write(html);
-      popup.document.close();
-      popup.focus();
-      setTimeout(() => popup.print(), 250);
-    } else {
-      window.print();
+    // expo-print's web implementation ignores the supplied HTML and calls
+    // window.print() on the current app. Printing here would therefore print
+    // the dashboard (or a blank route), not the invoice. Navigate a real
+    // print document to the generated HTML instead.
+    const popup = window.open("", "_blank");
+    if (!popup) {
+      throw new Error("Please allow pop-ups to download your bill as a PDF.");
     }
+
+    popup.document.open();
+    popup.document.write(html);
+    popup.document.close();
+
+    await new Promise<void>((resolve) => {
+      const print = () => {
+        window.setTimeout(() => {
+          popup.focus();
+          popup.print();
+          resolve();
+        }, 150);
+      };
+
+      if (popup.document.readyState === "complete") {
+        print();
+      } else {
+        popup.addEventListener("load", print, { once: true });
+      }
+    });
     return;
   }
 
