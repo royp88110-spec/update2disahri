@@ -4,8 +4,6 @@ import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Animated,
-  Easing,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -32,89 +30,17 @@ export default function LoginScreen() {
   const [phoneFocused, setPhoneFocused] = useState(false);
   const [passFocused, setPassFocused] = useState(false);
   const passwordRef = useRef<TextInput>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  const screenOpacity = useRef(new Animated.Value(1)).current;
-  const screenTranslateY = useRef(new Animated.Value(0)).current;
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const logoScale = useRef(new Animated.Value(0.82)).current;
-  const headerOpacity = useRef(new Animated.Value(0)).current;
-  const headerTranslateY = useRef(new Animated.Value(16)).current;
-  const cardOpacity = useRef(new Animated.Value(0)).current;
-  const cardTranslateY = useRef(new Animated.Value(28)).current;
-  const cardScale = useRef(new Animated.Value(0.97)).current;
-  const phoneOpacity = useRef(new Animated.Value(0)).current;
-  const phoneTranslateY = useRef(new Animated.Value(12)).current;
-  const passwordOpacity = useRef(new Animated.Value(0)).current;
-  const passwordTranslateY = useRef(new Animated.Value(12)).current;
-  const buttonOpacity = useRef(new Animated.Value(0)).current;
-  const buttonTranslateY = useRef(new Animated.Value(12)).current;
   const launchRedirectedRef = useRef(false);
 
-  const animateTo = (destination: "/admin" | "/member" | "/setup") => {
+  const redirectTo = (destination: "/admin" | "/member" | "/setup") => {
     if (launchRedirectedRef.current) return;
     launchRedirectedRef.current = true;
-    setIsTransitioning(true);
-    Animated.parallel([
-      Animated.timing(screenOpacity, {
-        toValue: 0,
-        duration: 380,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(screenTranslateY, {
-        toValue: -12,
-        duration: 400,
-        easing: Easing.out(Easing.inOut(Easing.cubic)),
-        useNativeDriver: true,
-      }),
-    ]).start(({ finished }) => {
-      if (finished) router.replace(destination);
-    });
+    router.replace(destination);
   };
 
   React.useEffect(() => {
-    const entrance = Animated.stagger(65, [
-      Animated.parallel([
-        Animated.timing(logoOpacity, { toValue: 1, duration: 420, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-        Animated.spring(logoScale, { toValue: 1, damping: 15, stiffness: 180, mass: 0.8, overshootClamping: true, useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(headerOpacity, { toValue: 1, duration: 320, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-        Animated.timing(headerTranslateY, { toValue: 0, duration: 360, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(cardOpacity, { toValue: 1, duration: 360, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-        Animated.timing(cardTranslateY, { toValue: 0, duration: 420, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-        Animated.spring(cardScale, { toValue: 1, damping: 18, stiffness: 190, mass: 0.8, overshootClamping: true, useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(phoneOpacity, { toValue: 1, duration: 260, useNativeDriver: true }),
-        Animated.timing(phoneTranslateY, { toValue: 0, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(passwordOpacity, { toValue: 1, duration: 260, useNativeDriver: true }),
-        Animated.timing(passwordTranslateY, { toValue: 0, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(buttonOpacity, { toValue: 1, duration: 260, useNativeDriver: true }),
-        Animated.timing(buttonTranslateY, { toValue: 0, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      ]),
-    ]);
-    entrance.start();
-    return () => entrance.stop();
-  }, [
-    buttonOpacity, buttonTranslateY, cardOpacity, cardScale, cardTranslateY,
-    headerOpacity, headerTranslateY, logoOpacity, logoScale, passwordOpacity,
-    passwordTranslateY, phoneOpacity, phoneTranslateY,
-  ]);
-
-  React.useEffect(() => {
     if (isLoading || (!user && !needsSetup) || launchRedirectedRef.current) return;
-    const timer = setTimeout(() => {
-      animateTo(needsSetup ? "/setup" : user!.role === "admin" ? "/admin" : "/member");
-    }, 400);
-    return () => clearTimeout(timer);
+    redirectTo(needsSetup ? "/setup" : user!.role === "admin" ? "/admin" : "/member");
   }, [isLoading, needsSetup, user]);
 
   const handleLogin = async () => {
@@ -134,24 +60,14 @@ export default function LoginScreen() {
   };
 
   return (
-    <Animated.View
-      style={[
-        styles.screen,
-        { opacity: screenOpacity, transform: [{ translateY: screenTranslateY }] },
-      ]}
-    >
+    <View style={styles.screen}>
     <LinearGradient colors={BG_GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.gradient}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.flex}>
         <View style={[styles.container, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 24 }]}>
 
           {/* ── Logo + Branding ── */}
           <View style={styles.header}>
-            <Animated.View
-              style={[
-                styles.logoGlowOuter,
-                { opacity: logoOpacity, transform: [{ scale: logoScale }] },
-              ]}
-            >
+            <View style={styles.logoGlowOuter}>
               <View style={styles.logoGlowInner}>
                 <LinearGradient
                   colors={[PRIMARY, PRIMARY2]}
@@ -162,33 +78,20 @@ export default function LoginScreen() {
                   <Feather name="coffee" size={34} color="#fff" />
                 </LinearGradient>
               </View>
-            </Animated.View>
+            </View>
 
-            <Animated.View
-              style={[
-                styles.titleBlock,
-                { opacity: headerOpacity, transform: [{ translateY: headerTranslateY }] },
-              ]}
-            >
+            <View style={styles.titleBlock}>
               <Text style={styles.appName}>Dishari Mess</Text>
               <Text style={styles.appTagline}>Management System</Text>
               <View style={styles.taglinePill}>
                 <Feather name="shield" size={11} color={PRIMARY} />
                 <Text style={styles.taglinePillText}>Secure · Smart · Seamless</Text>
               </View>
-            </Animated.View>
+            </View>
           </View>
 
           {/* ── Login Card ── */}
-          <Animated.View
-            style={[
-              styles.card,
-              {
-                opacity: cardOpacity,
-                transform: [{ translateY: cardTranslateY }, { scale: cardScale }],
-              },
-            ]}
-          >
+          <View style={styles.card}>
             <View style={styles.cardHeaderRow}>
               <View style={styles.cardHeaderIcon}>
                 <Feather name="log-in" size={18} color={PRIMARY} />
@@ -202,12 +105,7 @@ export default function LoginScreen() {
             <View style={[styles.cardDivider, { backgroundColor: colors.border }]} />
 
             {/* Phone */}
-            <Animated.View
-              style={[
-                styles.fieldGroup,
-                { opacity: phoneOpacity, transform: [{ translateY: phoneTranslateY }] },
-              ]}
-            >
+            <View style={styles.fieldGroup}>
               <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>Phone / User ID</Text>
               <View style={[
                 styles.inputWrap,
@@ -234,15 +132,10 @@ export default function LoginScreen() {
                   onSubmitEditing={() => passwordRef.current?.focus()}
                 />
               </View>
-            </Animated.View>
+            </View>
 
             {/* Password */}
-            <Animated.View
-              style={[
-                styles.fieldGroup,
-                { opacity: passwordOpacity, transform: [{ translateY: passwordTranslateY }] },
-              ]}
-            >
+            <View style={styles.fieldGroup}>
               <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>Password</Text>
               <View style={[
                 styles.inputWrap,
@@ -273,7 +166,7 @@ export default function LoginScreen() {
                   <Feather name={showPass ? "eye-off" : "eye"} size={16} color={passFocused ? PRIMARY : colors.mutedForeground} />
                 </Pressable>
               </View>
-            </Animated.View>
+            </View>
 
             {/* Error */}
             {error ? (
@@ -286,16 +179,11 @@ export default function LoginScreen() {
             ) : null}
 
             {/* Button */}
-            <Animated.View
-              style={[
-                styles.animatedButton,
-                { opacity: buttonOpacity, transform: [{ translateY: buttonTranslateY }] },
-              ]}
-            >
+            <View style={styles.buttonContainer}>
               <Pressable
                 onPress={handleLogin}
-                disabled={loading || isTransitioning}
-                style={({ pressed }) => [{ opacity: pressed || loading || isTransitioning ? 0.85 : 1 }]}
+                disabled={loading}
+                style={({ pressed }) => [{ opacity: pressed || loading ? 0.85 : 1 }]}
               >
                 <LinearGradient
                   colors={[PRIMARY, PRIMARY2]}
@@ -303,10 +191,10 @@ export default function LoginScreen() {
                   end={{ x: 1, y: 0 }}
                   style={styles.loginBtn}
                 >
-                  {loading || isTransitioning ? (
+                  {loading ? (
                     <View style={styles.loadingRow}>
                       <ActivityIndicator color="#fff" size="small" />
-                      <Text style={styles.loginBtnText}>{isTransitioning ? "Opening…" : "Signing In…"}</Text>
+                      <Text style={styles.loginBtnText}>Signing In…</Text>
                     </View>
                   ) : (
                     <View style={styles.loginBtnRow}>
@@ -316,8 +204,8 @@ export default function LoginScreen() {
                   )}
                 </LinearGradient>
               </Pressable>
-            </Animated.View>
-          </Animated.View>
+            </View>
+          </View>
 
           {/* ── Hint ── */}
           <View style={styles.hint}>
@@ -332,7 +220,7 @@ export default function LoginScreen() {
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>
-    </Animated.View>
+    </View>
   );
 }
 
@@ -390,7 +278,7 @@ const styles = StyleSheet.create({
   cardDivider: { height: 1, marginVertical: -4 },
 
   fieldGroup: { gap: 6 },
-  animatedButton: { width: "100%" },
+  buttonContainer: { width: "100%" },
   fieldLabel: { fontSize: 12, fontWeight: "600", letterSpacing: 0.4 },
   inputWrap: {
     flexDirection: "row", alignItems: "center",
