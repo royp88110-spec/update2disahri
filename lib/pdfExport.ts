@@ -106,7 +106,7 @@ function buildHtml(options: PdfExportOptions) {
   ].join("");
 
   return `<!doctype html>
-  <html>
+  <html class="${audience === "member" ? "member-document-html" : "admin-document-html"}">
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -159,10 +159,210 @@ function buildHtml(options: PdfExportOptions) {
          footer span:last-child { color: ${COLORS.violet}; font-weight: 800; }
           @media print { .page { box-shadow: none; } }
         @media (max-width: 600px) { .page { padding: 24px 18px; } .header { flex-direction: column; } .invoice-meta { text-align: left; } .summary { grid-template-columns: 1fr; } .member-banner { align-items: flex-start; flex-direction: column; } footer { flex-direction: column; } }
+
+         /* Member statement theme — intentionally scoped so admin copies remain unchanged. */
+         html.member-document-html { background: #EAF0F7; }
+         body.member-document-body {
+           background: linear-gradient(145deg, #EAF0F7 0%, #F5F8FC 54%, #E8EEF6 100%);
+           color: #102A43;
+         }
+         .member-document-body .page {
+           position: relative;
+           overflow: hidden;
+           background:
+             radial-gradient(circle at 100% 0%, #DDE7F433 0, #DDE7F400 29%),
+             radial-gradient(circle at 0% 100%, #D9D5FF2B 0, #D9D5FF00 25%),
+             linear-gradient(180deg, #F9FBFD 0%, #EEF3F8 100%);
+           color: #102A43;
+         }
+         .member-document-body .page::before,
+         .member-document-body .page::after {
+           position: absolute;
+           z-index: 0;
+           border: 1px solid #FFFFFF80;
+           border-radius: 999px;
+           content: "";
+           pointer-events: none;
+         }
+         .member-document-body .page::before {
+           top: 128px;
+           right: -92px;
+           width: 230px;
+           height: 230px;
+           background: #D8E2F033;
+         }
+         .member-document-body .page::after {
+           bottom: 86px;
+           left: -118px;
+           width: 260px;
+           height: 260px;
+           background: #DDD9FF24;
+         }
+         .member-document-body .page > * {
+           position: relative;
+           z-index: 1;
+         }
+         .member-document-body .header {
+           position: relative;
+           overflow: hidden;
+           border: 1px solid #FFFFFF2E;
+           border-radius: 22px;
+           background: linear-gradient(135deg, #0B1F3A 0%, #16385F 58%, #214E7D 100%);
+           box-shadow: 0 14px 28px #102A431C;
+         }
+         .member-document-body .header::after {
+           position: absolute;
+           top: -46px;
+           right: -32px;
+           width: 148px;
+           height: 148px;
+           border: 1px solid #FFFFFF1C;
+           border-radius: 999px;
+           background: #FFFFFF0A;
+           content: "";
+         }
+         .member-document-body .brand,
+         .member-document-body .invoice-meta {
+           position: relative;
+           z-index: 1;
+         }
+         .member-document-body .logo {
+           border: 3px solid #FFFFFF24;
+           background: linear-gradient(145deg, #FFF6A8 0%, #F7E967 100%);
+           color: #0B1F3A;
+           box-shadow: 0 8px 18px #06142652;
+         }
+         .member-document-body .brand h1,
+         .member-document-body .invoice-meta h2 {
+           color: #FFFFFF;
+         }
+         .member-document-body .brand p,
+         .member-document-body .invoice-meta p {
+           color: #D8E5F2;
+         }
+         .member-document-body .member-banner {
+           border: 1px solid #C8D6E5;
+           border-left: 4px solid #6D5AE6;
+           background: #FFFFFFD9;
+           box-shadow: 0 8px 18px #102A430D;
+         }
+         .member-document-body .member-banner span {
+           color: #61758A;
+         }
+         .member-document-body .member-banner strong {
+           color: #102A43;
+         }
+         .member-document-body .badge {
+           border-color: #FFFFFF;
+         }
+         .member-document-body .badge.partial {
+           color: #5B4B00;
+           background: #FFF8C9;
+           border-color: #F7E96780;
+         }
+         .member-document-body .summary {
+           margin-bottom: 28px;
+         }
+         .member-document-body .summary-card {
+           border: 1px solid #D6E0EB;
+           background: #FFFFFFE6;
+           box-shadow: 0 8px 18px #102A430B;
+         }
+         .member-document-body .summary-card:nth-child(1) {
+           border-color: #CFCBF4;
+           border-top: 3px solid #6D5AE6;
+           background: #FBFAFF;
+         }
+         .member-document-body .summary-card:nth-child(2) {
+           border-color: #E6DFA0;
+           border-top: 3px solid #F7E967;
+           background: #FFFDF0;
+         }
+         .member-document-body .summary-card:nth-child(3) {
+           border-color: #C9D8E6;
+           border-top: 3px solid #8AA6C1;
+           background: #F8FBFD;
+         }
+         .member-document-body .summary-card span {
+           color: #61758A;
+         }
+         .member-document-body .summary-card strong {
+           color: #102A43;
+         }
+         .member-document-body .section-title {
+           color: #415A77;
+         }
+         .member-document-body .table {
+           border: 1px solid #D1DDE9;
+           background: #FFFFFFD9;
+           box-shadow: 0 8px 18px #102A430D;
+         }
+         .member-document-body .row {
+           border-bottom-color: #DCE5EE;
+         }
+         .member-document-body .row span {
+           color: #61758A;
+         }
+         .member-document-body .table .row:nth-child(even) {
+           background: #F3F7FB;
+         }
+         .member-document-body .table .row:nth-child(3n) {
+           background: #F7F8FF;
+         }
+         .member-document-body .row strong {
+           color: #102A43;
+         }
+         .member-document-body .totals {
+           border: 1px solid #C8D6E5;
+           border-top: 4px solid #102A43;
+           background: linear-gradient(145deg, #F8FAFD 0%, #EEF2F7 100%);
+           color: #102A43;
+           box-shadow: 0 10px 22px #102A4314;
+         }
+         .member-document-body .totals .row {
+           border-color: #D4DFEA;
+         }
+         .member-document-body .totals .row span {
+           color: #61758A;
+         }
+         .member-document-body .totals .row strong {
+           color: #102A43;
+         }
+         .member-document-body .totals .row.emphasis {
+           background: transparent;
+         }
+         .member-document-body .totals .final {
+           border-top-color: #6D5AE6;
+           background: #F0EEFF;
+         }
+         .member-document-body .totals .final span {
+           color: #3C4773;
+         }
+         .member-document-body .totals .final strong {
+           color: #4B3BB4;
+         }
+         .member-document-body .note {
+           border: 1px solid #CCC8F2;
+           border-left: 5px solid #6D5AE6;
+           background: #F3F1FF;
+           color: #61758A;
+         }
+         .member-document-body footer {
+           border-top-color: #F7E967;
+           color: #61758A;
+         }
+         .member-document-body footer span:last-child {
+           color: #4B3BB4;
+         }
+         @media (max-width: 600px) {
+           .member-document-body .page { padding: 24px 18px; }
+           .member-document-body .header { padding: 20px; }
+           .member-document-body .summary { gap: 11px; }
+         }
       </style>
     </head>
-    <body>
-      <main class="page">
+    <body class="${audience === "member" ? "member-document-body" : "admin-document-body"}">
+      <main class="page ${audience === "member" ? "member-document" : "admin-document"}">
         <header class="header">
           <div class="brand">
             <div class="logo">D</div>
