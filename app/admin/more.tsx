@@ -26,7 +26,7 @@ import type { Fine } from "@/context/DataContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useColors } from "@/hooks/useColors";
 import { useRefresh } from "@/hooks/useRefresh";
-import { exportMonthlyBillPdf } from "@/lib/pdfExport";
+import { exportAllMonthlyBillsPdf, exportMonthlyBillPdf } from "@/lib/pdfExport";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -126,6 +126,7 @@ export default function MoreScreen() {
   const [activeSection, setActiveSection] = useState<Section>("eggs");
   const [month, setMonth] = useState(getCurrentMonth());
   const [exportingMemberId, setExportingMemberId] = useState<string | null>(null);
+  const [isExportingAll, setIsExportingAll] = useState(false);
 
   // Egg state
   const [eggModal, setEggModal]     = useState(false);
@@ -192,6 +193,24 @@ export default function MoreScreen() {
       Alert.alert("PDF Export Failed", (err as Error).message || "Could not create this bill PDF.");
     } finally {
       setExportingMemberId(null);
+    }
+  };
+
+  const handleExportAllBills = async () => {
+    setIsExportingAll(true);
+    try {
+      await exportAllMonthlyBillsPdf({
+        bills,
+        month,
+        payments: payments.map((payment) => ({
+          memberId: payment.memberId,
+          amount: payment.amount,
+        })),
+      });
+    } catch (err) {
+      Alert.alert("PDF Export Failed", (err as Error).message || "Could not create the monthly summary PDF.");
+    } finally {
+      setIsExportingAll(false);
     }
   };
 
@@ -534,6 +553,28 @@ export default function MoreScreen() {
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: insets.bottom + 100 }}
           refreshControl={REFRESH}
+          ListHeaderComponent={
+            <Pressable
+              onPress={() => void handleExportAllBills()}
+              disabled={isExportingAll || bills.length === 0}
+              style={({ pressed }) => [{ opacity: pressed || isExportingAll || bills.length === 0 ? 0.7 : 1, marginBottom: 14 }]}
+              accessibilityRole="button"
+              accessibilityLabel="Download all members' bills as one PDF"
+            >
+              <LinearGradient colors={[PRIMARY, "#6D5BD0"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.exportAllButton}>
+                {isExportingAll ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Feather name="layers" size={17} color="#fff" />
+                )}
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.exportAllButtonTitle}>Export All Members</Text>
+                  <Text style={styles.exportAllButtonSub}>One compact PDF summary for {monthLabel(month)}</Text>
+                </View>
+                <Feather name="download" size={17} color="#FFFFFFCC" />
+              </LinearGradient>
+            </Pressable>
+          }
           ListEmptyComponent={<Text style={[styles.emptyText, { color: colors.mutedForeground }]}>No data</Text>}
           renderItem={({ item: b }) => (
             <View style={[styles.reportCard, { backgroundColor: colors.card }]}>
@@ -1244,6 +1285,9 @@ const styles = StyleSheet.create({
   reportActions: { alignItems: "flex-end", gap: 7 },
   pdfButton: { flexDirection: "row", alignItems: "center", gap: 5, borderRadius: 10, paddingHorizontal: 9, paddingVertical: 6 },
   pdfButtonText: { fontSize: 11, fontWeight: "800" },
+  exportAllButton: { flexDirection: "row", alignItems: "center", gap: 11, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 13 },
+  exportAllButtonTitle: { color: "#fff", fontSize: 14, fontWeight: "800" },
+  exportAllButtonSub: { color: "#FFFFFFC7", fontSize: 11, marginTop: 2 },
   dueBadge: { borderRadius: 20, paddingHorizontal: 12, paddingVertical: 5 },
   dueText: { fontSize: 12, fontWeight: "700" },
   divider: { height: 1, marginBottom: 8 },
