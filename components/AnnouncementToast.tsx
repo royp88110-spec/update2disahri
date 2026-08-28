@@ -26,7 +26,7 @@ import type { Announcement } from "@/context/DataContext";
 const H_MARGIN        = 12;
 const AUTO_DISMISS_MS = 5000;
 const SCREEN_W         = Dimensions.get("window").width;
-const CARD_WIDTH       = Math.min(600, Math.max(0, SCREEN_W - H_MARGIN * 2));
+const CARD_WIDTH       = 460;
 // Offset beyond the right edge used for entrance/exit animation
 const ENTRY_OFFSET     = SCREEN_W + 24;
 
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     borderWidth:    1,
     overflow:       "hidden",
     width:          "100%",
-    height:         280,
+    height:         90,
     paddingRight:   10,
     gap:            10,
   },
