@@ -982,47 +982,60 @@ export default function MoreScreen() {
 
       {/* ══ Announcement Modal ══ */}
       <Modal visible={annModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalSheet, { backgroundColor: colors.card }]}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.foreground }]}>General Announcement</Text>
-              <Pressable onPress={() => setAnnModal(false)}>
-                <Feather name="x" size={22} color={colors.mutedForeground} />
-              </Pressable>
-            </View>
-            <View style={styles.formGroup}>
-              <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>TITLE</Text>
-              <TextInput
-                style={[styles.formInput, { color: colors.foreground, backgroundColor: colors.muted, borderColor: colors.border }]}
-                value={annForm.title}
-                onChangeText={(v) => setAnnForm((f) => ({ ...f, title: v }))}
-                placeholder="e.g. Mess closed on Sunday"
-                placeholderTextColor={colors.mutedForeground}
-              />
-            </View>
-            <View style={styles.formGroup}>
-              <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>MESSAGE</Text>
-              <TextInput
-                style={[styles.formInput, { color: colors.foreground, backgroundColor: colors.muted, borderColor: colors.border, minHeight: 100, textAlignVertical: "top" }]}
-                value={annForm.body}
-                onChangeText={(v) => setAnnForm((f) => ({ ...f, body: v }))}
-                placeholder="Write your announcement here…"
-                placeholderTextColor={colors.mutedForeground}
-                multiline
-                numberOfLines={4}
-              />
-            </View>
-            <Pressable
-              style={({ pressed }) => [{ opacity: (pressed || isSavingAnn) ? 0.7 : 1, marginTop: 4, marginBottom: 20 }]}
-              onPress={saveAnnouncement}
-              disabled={isSavingAnn}
+        <KeyboardAvoidingView
+          style={styles.announcementKeyboardAvoiding}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={0}
+        >
+          <View style={styles.modalOverlay}>
+            <ScrollView
+              style={styles.announcementModalScroll}
+              contentContainerStyle={styles.announcementModalScrollContent}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
             >
-              <LinearGradient colors={[PRIMARY, "#7C3AED"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.saveBtn}>
-                <Text style={styles.saveBtnText}>{isSavingAnn ? "Posting…" : "Post Announcement"}</Text>
-              </LinearGradient>
-            </Pressable>
+              <View style={[styles.modalSheet, { backgroundColor: colors.card }]}>
+                <View style={styles.modalHeader}>
+                  <Text style={[styles.modalTitle, { color: colors.foreground }]}>General Announcement</Text>
+                  <Pressable onPress={() => setAnnModal(false)}>
+                    <Feather name="x" size={22} color={colors.mutedForeground} />
+                  </Pressable>
+                </View>
+                <View style={styles.formGroup}>
+                  <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>TITLE</Text>
+                  <TextInput
+                    style={[styles.formInput, { color: colors.foreground, backgroundColor: colors.muted, borderColor: colors.border }]}
+                    value={annForm.title}
+                    onChangeText={(v) => setAnnForm((f) => ({ ...f, title: v }))}
+                    placeholder="e.g. Mess closed on Sunday"
+                    placeholderTextColor={colors.mutedForeground}
+                  />
+                </View>
+                <View style={styles.formGroup}>
+                  <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>MESSAGE</Text>
+                  <TextInput
+                    style={[styles.formInput, { color: colors.foreground, backgroundColor: colors.muted, borderColor: colors.border, minHeight: 100, textAlignVertical: "top" }]}
+                    value={annForm.body}
+                    onChangeText={(v) => setAnnForm((f) => ({ ...f, body: v }))}
+                    placeholder="Write your announcement here…"
+                    placeholderTextColor={colors.mutedForeground}
+                    multiline
+                    numberOfLines={4}
+                  />
+                </View>
+                <Pressable
+                  style={({ pressed }) => [{ opacity: (pressed || isSavingAnn) ? 0.7 : 1, marginTop: 4, marginBottom: 20 }]}
+                  onPress={saveAnnouncement}
+                  disabled={isSavingAnn}
+                >
+                  <LinearGradient colors={[PRIMARY, "#7C3AED"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.saveBtn}>
+                    <Text style={styles.saveBtnText}>{isSavingAnn ? "Posting…" : "Post Announcement"}</Text>
+                  </LinearGradient>
+                </Pressable>
+              </View>
+            </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* ══ Payment Reminder Modal ══ */}
@@ -1491,6 +1504,9 @@ const styles = StyleSheet.create({
     width: 40, height: 4, borderRadius: 2, backgroundColor: "rgba(148,163,184,0.4)",
     alignSelf: "center", marginBottom: 16,
   },
+  announcementKeyboardAvoiding: { flex: 1 },
+  announcementModalScroll: { flex: 1 },
+  announcementModalScrollContent: { flexGrow: 1, justifyContent: "flex-end" },
 
   // ── Modals ──
   modalOverlay: { flex: 1, backgroundColor: "#00000060", justifyContent: "flex-end" },
