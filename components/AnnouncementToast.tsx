@@ -10,6 +10,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useRef } from "react";
 import {
   Animated,
+  Dimensions,
   Easing,
   Pressable,
   StyleSheet,
@@ -24,14 +25,16 @@ import type { Announcement } from "@/context/DataContext";
 
 const H_MARGIN        = 12;
 const AUTO_DISMISS_MS = 5000;
-// Offset above screen used for entrance/exit animation
-const ENTRY_OFFSET    = -90;
+const SCREEN_W         = Dimensions.get("window").width;
+const CARD_WIDTH       = Math.min(600, Math.max(0, SCREEN_W - H_MARGIN * 2));
+// Offset beyond the right edge used for entrance/exit animation
+const ENTRY_OFFSET     = SCREEN_W + 24;
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 
 interface Theme {
   accentGrad:     readonly [string, string];
-  cardBg:         string;
+  cardGradient:   readonly [string, string, string];
   cardBorder:     string;
   shadowColor:    string;
   iconBg:         string;
@@ -54,47 +57,47 @@ interface Theme {
 function getTheme(type: Announcement["type"]): Theme {
   if (type === "payment_reminder") {
     return {
-      accentGrad:     ["#F59E0B", "#D97706"],
-      cardBg:         "#FFFBEB",
-      cardBorder:     "#FDE68A",
-      shadowColor:    "#92400E",
-      iconBg:         "#FFF7ED",
-      iconBorder:     "#FCD34D",
-      iconColor:      "#D97706",
+      accentGrad:     ["#B8F0FF", "#6EC8E8"],
+      cardGradient:   ["#071A33", "#123A60", "#255F7C"],
+      cardBorder:     "rgba(184,240,255,0.34)",
+      shadowColor:    "#071A33",
+      iconBg:         "rgba(184,240,255,0.18)",
+      iconBorder:     "rgba(184,240,255,0.52)",
+      iconColor:      "#B8F0FF",
       iconFamily:     "feather",
       iconName:       "bell",
-      titleColor:     "#1C1917",
-      subtitleColor:  "#78716C",
-      badgeBg:        "#F59E0B",
+      titleColor:     "#F7FCFF",
+      subtitleColor:  "#D6F3FF",
+      badgeBg:        "#B8F0FF",
       badgeText:      "DUE",
-      badgeTextColor: "#fff",
-      closeBg:        "rgba(0,0,0,0.05)",
-      closeBorder:    "rgba(0,0,0,0.08)",
-      closeIconColor: "#78716C",
-      progressBg:     "#FEF3C7",
-      progressFg:     "#F59E0B",
+      badgeTextColor: "#071A33",
+      closeBg:        "rgba(255,255,255,0.12)",
+      closeBorder:    "rgba(184,240,255,0.34)",
+      closeIconColor: "#E8FAFF",
+      progressBg:     "rgba(184,240,255,0.16)",
+      progressFg:     "#B8F0FF",
     };
   }
   return {
-    accentGrad:     ["#4F46E5", "#7C3AED"],
-    cardBg:         "#FFFFFF",
-    cardBorder:     "rgba(79,70,229,0.15)",
-    shadowColor:    "#4F46E5",
-    iconBg:         "#EDE9FE",
-    iconBorder:     "#C4B5FD",
-    iconColor:      "#4F46E5",
+    accentGrad:     ["#B8F0FF", "#6EC8E8"],
+    cardGradient:   ["#071A33", "#123A60", "#255F7C"],
+    cardBorder:     "rgba(184,240,255,0.34)",
+    shadowColor:    "#071A33",
+    iconBg:         "rgba(184,240,255,0.18)",
+    iconBorder:     "rgba(184,240,255,0.52)",
+    iconColor:      "#B8F0FF",
     iconFamily:     "ionicons",
     iconName:       "megaphone",
-    titleColor:     "#1E1B4B",
-    subtitleColor:  "#6B7280",
-    badgeBg:        "#4F46E5",
+    titleColor:     "#F7FCFF",
+    subtitleColor:  "#D6F3FF",
+    badgeBg:        "#B8F0FF",
     badgeText:      "NEW",
-    badgeTextColor: "#fff",
-    closeBg:        "rgba(0,0,0,0.05)",
-    closeBorder:    "rgba(0,0,0,0.08)",
-    closeIconColor: "#6B7280",
-    progressBg:     "#EDE9FE",
-    progressFg:     "#4F46E5",
+    badgeTextColor: "#071A33",
+    closeBg:        "rgba(255,255,255,0.12)",
+    closeBorder:    "rgba(184,240,255,0.34)",
+    closeIconColor: "#E8FAFF",
+    progressBg:     "rgba(184,240,255,0.16)",
+    progressFg:     "#B8F0FF",
   };
 }
 
@@ -135,7 +138,7 @@ export function AnnouncementToast({ announcement, onDismiss }: Props) {
   const theme  = getTheme(announcement.type);
 
   // Animation values
-  const translateY = useRef(new Animated.Value(ENTRY_OFFSET)).current;
+  const translateX = useRef(new Animated.Value(ENTRY_OFFSET)).current;
   const opacity    = useRef(new Animated.Value(0)).current;
   const progress   = useRef(new Animated.Value(1)).current;
 
@@ -149,13 +152,13 @@ export function AnnouncementToast({ announcement, onDismiss }: Props) {
     if (timerRef.current) clearTimeout(timerRef.current);
     progressAnim.current?.stop();
 
-    // Exit: slide up + fade out simultaneously
+    // Exit: slide right + fade out simultaneously
     Animated.parallel([
-      Animated.timing(translateY, {
+      Animated.timing(translateX, {
         toValue:         ENTRY_OFFSET,
-        duration:        240,
+        duration:        260,
         useNativeDriver: true,
-        easing:          Easing.in(Easing.cubic),
+        easing:          Easing.inOut(Easing.cubic),
       }),
       Animated.timing(opacity, {
         toValue:         0,
@@ -164,18 +167,16 @@ export function AnnouncementToast({ announcement, onDismiss }: Props) {
         easing:          Easing.in(Easing.quad),
       }),
     ]).start(() => onDismiss());
-  }, [onDismiss, translateY, opacity]);
+  }, [onDismiss, translateX, opacity]);
 
   useEffect(() => {
-    // Entrance: slide down from above + fade in
+    // Entrance: slide in from the right without bounce
     Animated.parallel([
-      Animated.spring(translateY, {
-        toValue:           0,
-        useNativeDriver:   true,
-        damping:           22,
-        stiffness:         280,
-        mass:              0.75,
-        overshootClamping: true,
+      Animated.timing(translateX, {
+        toValue:         0,
+        duration:        320,
+        useNativeDriver: true,
+        easing:          Easing.out(Easing.cubic),
       }),
       Animated.timing(opacity, {
         toValue:         1,
@@ -220,13 +221,19 @@ export function AnnouncementToast({ announcement, onDismiss }: Props) {
         {
           top:        insets.top + 8,
           shadowColor: theme.shadowColor,
-          transform:  [{ translateY }],
+          width:      CARD_WIDTH,
+          transform:  [{ translateX }],
           opacity,
         },
       ]}
     >
       {/* ── Card ─────────────────────────────────────────────────────────── */}
-      <View style={[styles.card, { backgroundColor: theme.cardBg, borderColor: theme.cardBorder }]}>
+      <LinearGradient
+        colors={theme.cardGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.card, { borderColor: theme.cardBorder }]}
+      >
 
         {/* Left accent stripe */}
         <LinearGradient
@@ -269,7 +276,7 @@ export function AnnouncementToast({ announcement, onDismiss }: Props) {
             <Feather name="x" size={11} color={theme.closeIconColor} />
           </View>
         </Pressable>
-      </View>
+      </LinearGradient>
 
       {/* ── Progress bar ─────────────────────────────────────────────────── */}
       <View style={[styles.progressTrack, { backgroundColor: theme.progressBg }]}>
@@ -308,10 +315,12 @@ const styles = StyleSheet.create({
   card: {
     flexDirection:  "row",
     alignItems:     "center",
+    justifyContent: "center",
     borderRadius:   16,
     borderWidth:    1,
     overflow:       "hidden",
-    minHeight:      50,
+    width:          "100%",
+    height:         280,
     paddingRight:   10,
     gap:            10,
   },
@@ -358,7 +367,7 @@ const styles = StyleSheet.create({
   title: {
     flex:          1,
     fontSize:      13,
-    fontWeight:    "700",
+    fontWeight:    "800",
     lineHeight:    18,
     letterSpacing: -0.1,
   },
@@ -366,7 +375,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize:   12,
     lineHeight: 16,
-    fontWeight: "400",
+    fontWeight: "600",
   },
 
   closeBtn:    { flexShrink: 0 },
